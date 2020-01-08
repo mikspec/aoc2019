@@ -1,34 +1,49 @@
+import scala.annotation.tailrec
+
 object Day02 extends App {
 
-  val progArray = scala.io.Source.fromResource("inputs/day02.txt").getLines.takeWhile(_ != "").next.split(",").map(_.toInt)
+  val progCode = scala.io.Source.fromResource("inputs/day02.txt").getLines.takeWhile(_ != "").next.split(",").map(_.toInt).toVector
 
-  def gravityCalc(prog: Array[Int]):Int = {
-    for (i <- 0 until prog.length by 4) {
-       if (prog(i) == 99) return prog(0)
-       if (prog(i + 3) >= prog.length) prog.padTo(prog(i + 3), -1) 
-       if ((prog(i + 1) >= prog.length) || (prog(i + 1) < 0)) return -1
-       if ((prog(i + 2) >= prog.length) || (prog(i + 2) < 0)) return -1
-       if (prog(i) == 1) prog(prog(i + 3)) = prog(prog(i + 1)) + prog(prog(i + 2))
-       else if (prog(i) == 2) prog(prog(i + 3)) = prog(prog(i + 1)) * prog(prog(i + 2))
-       else return -1
+  def gravityCalc(prog: Vector[Int]):Int = {
+
+    def regUpdate(reg: Vector[Int], index: Int, oper: (Int,Int) => Int): Vector[Int] = 
+      reg.updated(reg(index + 3), oper(reg(reg(index + 1)), reg(reg(index + 2))))
+
+    @tailrec
+    def step(reg: Vector[Int], index: Int): Vector[Int] = reg(index) match {
+      case 99 => reg
+      case 1  => step(regUpdate(reg, index, _ + _), index + 4)
+      case 2  => step(regUpdate(reg, index, _ * _), index + 4)
+      case _  => throw new IllegalArgumentException("")
     }
-    return prog(0)
+
+    step(prog, 0).head
   }
 
-  progArray(1) = 12
-  progArray(2) = 2
-  println(s"Day 02 part1 = ${gravityCalc(progArray.clone())}")
+  println(s"Day 02 part1 = ${gravityCalc(progCode.updated(1, 12).updated(2, 2))}")
   
-  def part2(program: Array[Int]):Int = {
+  def part2(program: Vector[Int]):Int = {
     for (i <- 0 to 99) {
       for (j <- 0 to 99) {
-        program(1) = i
-        program(2) = j
-        if (gravityCalc(program.clone()) == 19690720) return i*100 + j
+        if (gravityCalc(program.updated(1, i).updated(2, j)) == 19690720) return i*100 + j
       }
     }
     return -1
   }
   
-  println(s"Day 02 part2 = ${part2(progArray.clone())}")
+  println(s"Day 02 part2 = ${part2(progCode)}")
+
+  lazy val generateInputs: LazyList[(Int, Int)] =
+    LazyList.from(0).flatMap(variations(_).to(LazyList))
+
+  def variations(a: Int): Set[(Int, Int)] =
+    (0 to a).flatMap(b => Seq((a, b), (b, a))).toSet
+
+  val part2var2 = generateInputs
+      //.map { case (noun, verb) => println(s"Trying: $noun and $verb"); (noun, verb)}
+      .find { case (noun, verb) => gravityCalc(progCode.updated(1, noun).updated(2, verb)) == 19690720}
+      .map {case (noun, verb) => 100 * noun + verb}
+      .get
+
+  println(s"Day 02 part2 variant2 = ${part2var2}")
 }
