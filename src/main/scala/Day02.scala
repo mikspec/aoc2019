@@ -2,8 +2,8 @@ import scala.annotation.tailrec
 
 object Day02 extends App {
 
-  val progCode = scala.io.Source.fromResource("inputs/day02.txt").getLines.takeWhile(_ != "").next.split(",").map(_.toInt).toVector
-
+  val progCode = scala.io.Source.fromResource("inputs/day02.txt").getLines().toSeq.flatMap(_.split(",")).map(_.toInt).toVector
+  
   def gravityCalc(prog: Vector[Int]):Int = {
 
     def regUpdate(reg: Vector[Int], index: Int, oper: (Int,Int) => Int): Vector[Int] = 
