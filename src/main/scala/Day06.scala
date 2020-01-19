@@ -14,15 +14,15 @@ object Day06 extends App {
         (center, satellite) 
     })
     .groupBy { case (center, satellite) => center }
-    .map { case (k, list) => k -> list.map(_._2) }
+    .map { case (k, list) => k -> list.map { _._2 } }
     
   def distanceMap(universe: Map[String, Seq[String]], center: String): Map[String, Int] = {    
     @tailrec
     def traverseDist(planetList: Seq[(String, Int)], accum: Map[String, Int]): Map[String, Int] = {
       if (planetList.isEmpty) accum
       else traverseDist(
-        planetList.tail ++ universe.getOrElse(planetList.head._1, List()).map { (_, (planetList.head._2 + 1)) }, 
-        accum ++ universe.getOrElse(planetList.head._1, List()).map { _ -> (planetList.head._2 + 1) } 
+        planetList.tail ++ universe.getOrElse(planetList.head._1, Seq()).map { (_, (planetList.head._2 + 1)) }, 
+        accum ++ universe.getOrElse(planetList.head._1, Seq()).map { _ -> (planetList.head._2 + 1) } 
       )
     }
     traverseDist(Seq((center, 0)), Map(center -> 0))
