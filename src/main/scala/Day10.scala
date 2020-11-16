@@ -6,7 +6,7 @@ object Day10 extends App {
 
   case class Position(rowNum: Int, colNum: Int)
 
-  def createMap(image: Seq[String]): Set[Position] = {
+  def createMap(image: Seq[String]): Set[Position] =
     image.zipWithIndex
       .map {
         case (line, rowNum) => {
@@ -19,13 +19,10 @@ object Day10 extends App {
       .filter { case (asteroid, _, _) => asteroid == '#' }
       .map { case (_, rowNum, colNum) => Position(rowNum, colNum) }
       .toSet
-  }
 
   @tailrec
-  def gcd(a: Int, b: Int): Int = {
-    if (b == 0) a
-    else gcd(b, a % b)
-  }
+  def gcd(a: Int, b: Int): Int =
+    if (b == 0) a else gcd(b, a % b)
 
   def calculateVisibility(
       asteroid: Position,
@@ -44,14 +41,9 @@ object Day10 extends App {
   def processSkyMap(skyMap: Set[Position]): Tuple2[Position, Int] =
     skyMap
       .map { asteroid =>
-        (
-          asteroid,
-          calculateVisibility(asteroid, skyMap - asteroid)
-        )
+        (asteroid, calculateVisibility(asteroid, skyMap - asteroid))
       }
-      .reduce { (a: Tuple2[Position, Int], b: Tuple2[Position, Int]) =>
-        { if (a._2 > b._2) a else b }
-      }
+      .reduce { (a, b) => if (a._2 > b._2) a else b }
 
   println(s"Day 10 part1 = ${processSkyMap(createMap(image))}")
 }
