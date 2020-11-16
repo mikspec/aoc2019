@@ -4,7 +4,9 @@ object Day10 extends App {
 
   val image = scala.io.Source.fromResource("inputs/day10.txt").getLines().toSeq
 
-  def createMap(image: Seq[String]): Set[Tuple2[Int, Int]] = {
+  case class Position(rowNum: Int, colNum: Int)
+
+  def createMap(image: Seq[String]): Set[Position] = {
     image.zipWithIndex
       .map {
         case (line, rowNum) => {
@@ -15,7 +17,7 @@ object Day10 extends App {
       }
       .flatten
       .filter { case (asteroid, _, _) => asteroid == '#' }
-      .map { case (_, rowNum, colNum) => (rowNum, colNum) }
+      .map { case (_, rowNum, colNum) => Position(rowNum, colNum) }
       .toSet
   }
 
@@ -26,28 +28,30 @@ object Day10 extends App {
   }
 
   def calculateVisibility(
-      asteroid: Tuple2[Int, Int],
-      skyMap: Set[Tuple2[Int, Int]]
+      asteroid: Position,
+      skyMap: Set[Position]
   ): Int =
     skyMap.map {
-      case (y, x) => {
-        val div = gcd(Math.abs(y - asteroid._1), Math.abs(x - asteroid._2))
-        ((y - asteroid._1) / div, (x - asteroid._2) / div)
+      case Position(rowNum, colNum) => {
+        val div = gcd(
+          Math.abs(rowNum - asteroid.rowNum),
+          Math.abs(colNum - asteroid.colNum)
+        )
+        ((rowNum - asteroid.rowNum) / div, (colNum - asteroid.colNum) / div)
       }
     }.size
 
-  val skyMap = createMap(image)
-  val newMap = skyMap
-    .map { asteroid =>
-      (
-        asteroid._1,
-        asteroid._2,
-        calculateVisibility(asteroid, skyMap - asteroid)
-      )
-    }
-    .reduce { (a: Tuple3[Int, Int, Int], b: Tuple3[Int, Int, Int]) =>
-       { if (a._3 > b._3) a else b }
-    }
-  println(s"Day 10 part1")
-  println(newMap._3)
+  def processSkyMap(skyMap: Set[Position]): Tuple2[Position, Int] =
+    skyMap
+      .map { asteroid =>
+        (
+          asteroid,
+          calculateVisibility(asteroid, skyMap - asteroid)
+        )
+      }
+      .reduce { (a: Tuple2[Position, Int], b: Tuple2[Position, Int]) =>
+        { if (a._2 > b._2) a else b }
+      }
+
+  println(s"Day 10 part1 = ${processSkyMap(createMap(image))}")
 }
