@@ -103,5 +103,5 @@ object Day10 extends App {
 
   val lastVaporized =
     laserRun(laserMap(station._1, (skyMap - station._1).toList), null, 200)
-  println(s"Day 10 part 2 ${lastVaporized.colNum * 100 + lastVaporized.rowNum}")
+  println(s"Day 10 part2 = ${lastVaporized.colNum * 100 + lastVaporized.rowNum}")
 }
