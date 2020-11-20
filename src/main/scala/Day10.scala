@@ -10,15 +10,12 @@ object Day10 extends App {
   case class Position(rowNum: Int, colNum: Int)
 
   def createMap(image: Seq[String]): Set[Position] =
-    image.zipWithIndex
-      .map {
-        case (line, rowNum) => {
+    image.zipWithIndex.flatMap {
+        case (line, rowNum) =>
           line.zipWithIndex.map { case (asteroid, colNum) =>
             (asteroid, rowNum, colNum)
           }
-        }
       }
-      .flatten
       .filter { case (asteroid, _, _) => asteroid == '#' }
       .map { case (_, rowNum, colNum) => Position(rowNum, colNum) }
       .toSet
@@ -41,7 +38,7 @@ object Day10 extends App {
       }
     }.size
 
-  def processSkyMap(skyMap: Set[Position]): Tuple2[Position, Int] =
+  def processSkyMap(skyMap: Set[Position]): (Position, Int) =
     skyMap
       .map { asteroid =>
         (asteroid, calculateVisibility(asteroid, skyMap - asteroid))
@@ -56,7 +53,7 @@ object Day10 extends App {
   def calcAngle(
       stationPos: Position,
       asteroid: Position
-  ): Tuple3[Double, Int, Position] = {
+  ): (Double, Int, Position) = {
     val x = asteroid.colNum - stationPos.colNum
     val y = asteroid.rowNum - stationPos.rowNum
     val d = Math.abs(x) + Math.abs(y)
@@ -72,7 +69,7 @@ object Day10 extends App {
   def laserMap(
       stationPos: Position,
       skyMap: List[Position]
-  ): ListMap[Double, List[Tuple3[Double, Int, Position]]] =
+  ): ListMap[Double, List[(Double, Int, Position)]] =
     ListMap(
       skyMap
         .map { asteroid => calcAngle(stationPos, asteroid) }
@@ -86,9 +83,9 @@ object Day10 extends App {
 
   @tailrec
   def laserRun(
-      skyMap: ListMap[Double, List[Tuple3[Double, Int, Position]]],
-      lastVaporized: Position,
-      count: Int
+                skyMap: ListMap[Double, List[(Double, Int, Position)]],
+                lastVaporized: Position,
+                count: Int
   ): Position = {
     if (count == 0) lastVaporized
     else if (skyMap.head._2.size == 1)
