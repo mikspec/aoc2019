@@ -207,7 +207,7 @@ object Day09 extends App {
               relativeBaseOffset
             )
           )
-        case _ => throw new IllegalArgumentException("")
+        case _ => throw new IllegalArgumentException(s"${index} - ${reg.getOrElse(index, BigInt(0))}")
       }
     }
     step(prog, index, input, relativeBaseOffset)

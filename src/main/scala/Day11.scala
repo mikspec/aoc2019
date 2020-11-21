@@ -74,29 +74,49 @@ object Day11 extends App {
                surface: Surface,
                stack: Map[BigInt, BigInt],
                index: BigInt,
-               relativeBaseOffset: BigInt,
-               count: Int): Surface = {
-    println(s"${count} - ${index} - ${stack(index)}")
+               relativeBaseOffset: BigInt): Surface = {
     val color = robot.camera(surface)
     val conf = Seq(if (color == Color.WHITE) BigInt(1) else BigInt(0))
     intProg(stack, conf, index, relativeBaseOffset) match {
       case State(output1, stack1, index1, relativeBaseOffset1) => {
         if (index1 == -1) surface
-        val paintColor = if (output1 == 1) Color.WHITE else Color.BLACK
-        val newSurface = robot.paint(paintColor, surface)
-        println(s"${count+1} - ${index} - ${stack(index)}")
-        intProg(stack1, Seq(), index1, relativeBaseOffset1) match {
-          case State(output2, stack2, index2, relativeBaseOffset2)  => {
-            if (index2 == -1) newSurface
-            val newRobot = robot.step(output2.toInt)
-            runRobot(newRobot, newSurface, stack2, index2, relativeBaseOffset2, count + 2)
+        else {
+          val paintColor = if (output1 == 1) Color.WHITE else Color.BLACK
+          val newSurface = robot.paint(paintColor, surface)
+          intProg(stack1, Seq(), index1, relativeBaseOffset1) match {
+            case State(output2, stack2, index2, relativeBaseOffset2) => {
+              if (index2 == -1) newSurface
+              else {
+                val newRobot = robot.step(output2.toInt)
+                runRobot(newRobot, newSurface, stack2, index2, relativeBaseOffset2)
+              }
+            }
           }
         }
       }
     }
   }
 
-  val surface = runRobot(Robot(Position(0,0), UP), Map(), progCode, BigInt(0), BigInt(0), 0)
+  val surface: Surface = runRobot(Robot(Position(0,0), UP), Map(), progCode, BigInt(0), BigInt(0))
+  println(s"Day 11 part1 = ${surface.size}")
 
-  println(s"${surface}")
+  val surface2 = runRobot(
+    Robot(Position(0,0), UP),
+    Map(Position(0,0) -> Field(Color.WHITE, false)),
+    progCode,
+    BigInt(0),
+    BigInt(0))
+    .groupBy { _._1.y }
+
+  println(s"Day 11 part2")
+
+  (0 to 5).foreach(y => {
+    val row = surface2.getOrElse(y, Map())
+    (0 to 42).foreach(x => {
+      val field = row.getOrElse(Position(x, y), Field(Color.BLACK, false))
+      if ( field.color == Color.WHITE) print("#")
+      else print(" ")
+    })
+    print("\n")
+  })
 }
