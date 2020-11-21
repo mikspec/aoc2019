@@ -7,13 +7,13 @@ object Day06 extends App {
   val San = "SAN"
   val pattern = "(.+)\\)(.+)".r
 
-  val universeMap = scala.io.Source.fromResource("inputs/day06.txt")
+  val universeMap: Map[String, Seq[String]] = scala.io.Source.fromResource("inputs/day06.txt")
     .getLines()
     .toSeq.map(conf => {
         val pattern(center,satellite) = conf
         (center, satellite) 
     })
-    .groupBy { case (center, satellite) => center }
+    .groupBy { case (center, _) => center }
     .map { case (k, list) => k -> list.map { _._2 } }
     
   def distanceMap(universe: Map[String, Seq[String]], center: String): Map[String, Int] = {    
@@ -30,7 +30,7 @@ object Day06 extends App {
 
   val distMap = distanceMap(universeMap, UniverseCenter)
 
-  val reverseMap = universeMap.flatMap { case (center, satellite) => satellite.map { sat => sat -> center } }
+  val reverseMap: Map[String, String] = universeMap.flatMap { case (center, satellite) => satellite.map { sat => sat -> center } }
 
   @tailrec
   def getPath(revMap: Map[String, String], from: String, path: Set[String]): Set[String] = {
