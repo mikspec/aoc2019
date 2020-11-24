@@ -16,9 +16,17 @@ class Day12Test extends org.scalatest.FunSuite {
     val universe = Day12.getUniverse("inputs/day12-01.txt")
 
     assert(
-      runUniverse(universe, stepPosition(stepVelocity(universe)), 1, Map())
-        .flatMap { case (_, v) => List(v._1, v._2, v._3) }
-        .foldLeft(BigInt(1)) { (a: BigInt, b:Long) => a / gcd(a, BigInt(b)) * b }
+      runUniverse(
+        universe,
+        stepPosition(stepVelocity(universe)),
+        1,
+        (0, 0, 0)
+      ).productIterator.toList
+        .foldLeft(1L) { (a: Long, b: Any) =>
+          a / gcd(a, b.asInstanceOf[Number].longValue()) * b
+            .asInstanceOf[Number]
+            .longValue()
+        }
         === 2772
     )
   }
@@ -26,13 +34,21 @@ class Day12Test extends org.scalatest.FunSuite {
   test("Day 12 test part 02 - 2") {
 
     val universe = Day12.getUniverse("inputs/day12-02.txt")
+    val newUniverse = stepPosition(stepVelocity(universe))
 
     assert(
-      runUniverse(universe, stepPosition(stepVelocity(universe)), 1, Map())
-        .flatMap { case (_, v) => List(v._1, v._2, v._3) }
-        //foldLeft(BigInt(1)) { (a: BigInt, b:Long) => a / gcd(a, BigInt(b)) * BigInt(b) }
-        /// 4686774924L
-        === 2772
+      runUniverse(
+        universe,
+        stepPosition(stepVelocity(universe)),
+        1,
+        (0, 0, 0)
+      ).productIterator.toList
+        .foldLeft(1L) { (a: Long, b: Any) =>
+          a / gcd(a, b.asInstanceOf[Number].longValue()) * b
+            .asInstanceOf[Number]
+            .longValue()
+        }
+        === 4686774924L
     )
   }
 }
