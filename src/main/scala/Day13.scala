@@ -20,7 +20,6 @@ object Day13 extends App {
 
   @tailrec
   def runProgram(
-      surface: Surface,
       stack: Map[BigInt, BigInt],
       index: BigInt,
       relativeBaseOffset: BigInt,
@@ -31,7 +30,6 @@ object Day13 extends App {
         if (index1 == -1) output
         else
           runProgram(
-            surface,
             stack1,
             index1,
             relativeBaseOffset1,
@@ -41,7 +39,7 @@ object Day13 extends App {
     }
   }
 
-  val arcadeMap = runProgram(Map(), progCode, 0, 0, Seq())
+  val arcadeMap = runProgram(progCode, 0, 0, Seq())
     .grouped(3)
     .toList
     .map { x =>
@@ -63,4 +61,57 @@ object Day13 extends App {
 
   println
   println(s"Day 13 part1 ${arcadeMap.filter { case (_ -> v) => v == 2 }.size}")
+
+  @tailrec
+  def playGame(
+      stack: Map[BigInt, BigInt],
+      index: BigInt,
+      relativeBaseOffset: BigInt,
+      output: Seq[Int],
+      input: Seq[BigInt],
+      ball: Position,
+      paddle: Position,
+      score: BigInt
+  ): BigInt = {
+    intProg(stack, input, index, relativeBaseOffset) match {
+      case State(output1, stack1, index1, relativeBaseOffset1) => {
+        if (index1 == -1) score
+        else {
+          val newOutput =
+            if (output.size == 2) Seq() else output :+ output1.toInt
+          val newScore =
+            if (output.size == 2 && output.head == -1 && output.tail.head == 0)
+              output1
+            else score
+          val newBall =
+            if (output.size == 2 && output1 == BigInt(4))
+              Position(output.head, output.tail.head)
+            else ball
+          val newPaddle =
+            if (output.size == 2 && output1 == BigInt(3))
+              Position(output.head, output.tail.head)
+            else paddle
+          val joystic = if (newBall != null && newPaddle != null) {
+            if (newBall.x == newPaddle.x) Seq(BigInt(0))
+            else if (newBall.x > newPaddle.x) Seq(BigInt(1))
+            else Seq(BigInt(-1))
+          } else Seq(BigInt(0))
+          playGame(
+            stack1,
+            index1,
+            relativeBaseOffset1,
+            newOutput,
+            joystic,
+            newBall,
+            newPaddle,
+            newScore
+          )
+        }
+      }
+    }
+  }
+
+  println(
+    s"Day 13 part2 ${playGame(progCode.updated(0, 2), 0, 0, Seq(), Seq(), null, null, 0)}"
+  )
 }
