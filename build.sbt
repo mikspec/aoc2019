@@ -2,7 +2,7 @@ lazy val root = (project in file(".")).
   settings(
     inThisBuild(List(
       organization := "pl.mikspec",
-      scalaVersion := "2.13.1"
+      scalaVersion := "2.13.6"
     )),
     name := "aoc2019"
   )
