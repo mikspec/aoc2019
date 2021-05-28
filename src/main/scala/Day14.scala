@@ -6,7 +6,7 @@ object Day14 extends App {
   case class Item(name: String, quantity: Int)
   case class Recipe(quantity: Int, components: Seq[Item])
 
-  def getRecipe(file: String) = {
+  def getRecipe(file: String): Map[String, Recipe] = {
 
     val compoundPattern = "(.+) => (\\d+) ([A-Z]+)".r
     val itemsPattern = "(\\d+) ([A-Z]+)".r
@@ -30,8 +30,6 @@ object Day14 extends App {
       })
       .toMap
   }
-
-  def processRecipe()
 
   val recipe = getRecipe("inputs/day14.txt")
 
