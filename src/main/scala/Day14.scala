@@ -3,11 +3,11 @@ import scala.util.matching.Regex
 
 object Day14 extends App {
 
-  case class Item(name: String, quantityNeeded: Int, quantityProduced: Int)
+  case class Item(name: String, quantityNeeded: Long, quantityProduced: Long)
   case class Recipe(product: Item, components: Seq[Item])
 
   def getRecipe(file: String): Map[String, Recipe] = {
-    
+
     val compoundPattern = "(.+) => (\\d+) ([A-Z]+)".r
     val itemsPattern = "(\\d+) ([A-Z]+)".r
 
@@ -18,11 +18,11 @@ object Day14 extends App {
         val compoundPattern(items, quantity, name) = row
         name -> {
           Recipe(
-            Item(name, quantity.toInt, 0),
+            Item(name, quantity.toLong, 0),
             itemsPattern
               .findAllMatchIn(items)
               .map(x => {
-                Item(x.group(2), x.group(1).toInt, 0)
+                Item(x.group(2), x.group(1).toLong, 0)
               })
               .toSeq
           )
@@ -33,7 +33,7 @@ object Day14 extends App {
 
   @tailrec
   def multiplyItems(
-      factor: Int,
+      factor: Long,
       items: Seq[Item],
       accum: Seq[Item]
   ): Seq[Item] = {
@@ -105,9 +105,19 @@ object Day14 extends App {
     }
   }
 
-  val oreNeeded = processRecipe(Seq(Item("FUEL", 1, 0)), recipe, Map())("ORE").quantityNeeded
-
   println(
-    s"Day 14 part1 ${oreNeeded}"
+    s"Day 14 part 1 ${processRecipe(Seq(Item("FUEL", 1, 0)), recipe, Map())("ORE").quantityNeeded}"
   )
+
+  def processPart2(
+      recipe: Map[String, Recipe],
+      accum: Map[String, Item],
+      fuel: Long
+  ): Long = {
+    val state = processRecipe(Seq(Item("FUEL", 1, 0)), recipe, accum)
+    if (state("ORE").quantityNeeded > 1000000000000L) fuel
+    else processPart2(recipe, state, fuel + 1)
+  }
+
+  println(s"Day 14 part 2 ${processPart2(recipe, Map(), 0)}")
 }
