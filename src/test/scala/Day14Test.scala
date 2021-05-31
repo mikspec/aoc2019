@@ -45,7 +45,7 @@ class Day14Test extends org.scalatest.FunSuite {
   test("Day 14 test part 02 - case 04") {
 
     val recipe = getRecipe("inputs/day14-04.txt")
-    assert(processPart2(recipe, Map(), 0) === 460664)
+    assert(processPart2(recipe, 1000000000000L/2210736L, 1000000000000L) === 460664)
   }
 
 }

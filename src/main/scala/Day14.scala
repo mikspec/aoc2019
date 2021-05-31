@@ -105,19 +105,25 @@ object Day14 extends App {
     }
   }
 
+  val oreNeeded = processRecipe(Seq(Item("FUEL", 1, 0)), recipe, Map())("ORE").quantityNeeded
+
   println(
-    s"Day 14 part 1 ${processRecipe(Seq(Item("FUEL", 1, 0)), recipe, Map())("ORE").quantityNeeded}"
+    s"Day 14 part 1 ${oreNeeded}"
   )
 
+  @tailrec
   def processPart2(
       recipe: Map[String, Recipe],
-      accum: Map[String, Item],
-      fuel: Long
+      low: Long,
+      high: Long
   ): Long = {
-    val state = processRecipe(Seq(Item("FUEL", 1, 0)), recipe, accum)
-    if (state("ORE").quantityNeeded > 1000000000000L) fuel
-    else processPart2(recipe, state, fuel + 1)
+    if (low + 1 >= high) low
+    else {
+      val state = processRecipe(Seq(Item("FUEL", (high+low)/2, 0)), recipe, Map())
+      if (state("ORE").quantityNeeded > 1000000000000L) processPart2(recipe, low, (high+low)/2)  
+      else processPart2(recipe, (high+low)/2 ,high)
+    }
   }
 
-  println(s"Day 14 part 2 ${processPart2(recipe, Map(), 0)}")
+  println(s"Day 14 part 2 ${processPart2(recipe, 1000000000000L/oreNeeded, 100000000000L)}")
 }
