@@ -1,7 +1,8 @@
 import scala.annotation.tailrec
+
 object Day16 extends App {
 
-  val PATTERN: List[Int] = List(0, 1, 0, -1)
+  def getSourcePattern(): List[Int] = List(0, 1, 0, -1)
 
   def getInput(file: String): List[Int] = {
     scala.io.Source
@@ -31,16 +32,47 @@ object Day16 extends App {
   }
 
   def generatePattern(
-      n: Int,
-      sourcePattern: List[Int]
+      n: Int, 
+      size: Int
   ): LazyList[Int] = {
 
-    val pattern = multiplyPattern(n, sourcePattern, n, List()).toVector
+    val pattern = multiplyPattern(n, getSourcePattern(), n, List()).toVector
 
     def loop(n: Int, position: Int): LazyList[Int] =
       pattern(position % pattern.size) #:: loop(n, position + 1)
-    loop(n, 0)
+    loop(n, 0).drop(1).take(size)
   }
 
-  println(s"Day 16 part 1 ${generatePattern(3, PATTERN).drop(1).take(650).toList}")
+  @tailrec
+  def runPhase(
+      input: List[Int],
+      counter: Int,
+      output: List[Int]
+  ): List[Int] = {
+
+    if (counter == input.size) output
+    else {
+      val sum = input
+        .zip(generatePattern(counter + 1, input.size))
+        .map { x => x._1 * x._2 }
+        .sum
+        .abs
+
+      runPhase(input, counter + 1, output :+ sum % 10)
+    }
+  }
+
+  @tailrec
+  def runNumberOfPhases(input: List[Int], num: Int): List[Int] = {
+    if (num == 0) input
+    else {
+      val newImput = runPhase(input, 0, List())
+      println(s"Phase ${num} ${newImput.take(8)}")
+      runNumberOfPhases(newImput, num - 1)
+    }
+  }
+
+  println(
+    s"Day 16 part 1 ${runNumberOfPhases(getInput("inputs/day16.txt"), 100).take(8)}"
+  )
 }
