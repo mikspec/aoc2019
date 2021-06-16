@@ -64,7 +64,11 @@ object Day16 extends App {
   }
 
   @tailrec
-  def runNumberOfPhases(input: List[Int], num: Int, patternMap: Map[Int, List[Int]]): List[Int] = {
+  def runNumberOfPhases(
+      input: List[Int],
+      num: Int,
+      patternMap: Map[Int, List[Int]]
+  ): List[Int] = {
     if (num == 0) input
     else {
       val newInput = runPhase(input, patternMap, 0, List())
@@ -73,11 +77,13 @@ object Day16 extends App {
   }
 
   val input: List[Int] = getInput("inputs/day16.txt")
-  val patternMap: Map[Int, List[Int]] = (1 to input.size).toList.map { x => (x, generatePattern(x, input.size).toList) }.toMap
+  val patternMap: Map[Int, List[Int]] = (1 to input.size).toList.map { x =>
+    (x, generatePattern(x, input.size).toList)
+  }.toMap
 
   println(
-     s"\nDay 16 part 1 ${runNumberOfPhases(input, 100, patternMap).take(8).mkString}"
-   )
+    s"\nDay 16 part 1 ${runNumberOfPhases(input, 100, patternMap).take(8).mkString}"
+  )
 
   val offset = input.take(7).mkString.toInt
   val phaseSize = input.size * 10000 - offset
