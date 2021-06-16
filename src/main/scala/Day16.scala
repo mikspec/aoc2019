@@ -32,7 +32,7 @@ object Day16 extends App {
   }
 
   def generatePattern(
-      n: Int, 
+      n: Int,
       size: Int
   ): LazyList[Int] = {
 
@@ -46,6 +46,7 @@ object Day16 extends App {
   @tailrec
   def runPhase(
       input: List[Int],
+      patternMap: Map[Int, List[Int]],
       counter: Int,
       output: List[Int]
   ): List[Int] = {
@@ -53,26 +54,70 @@ object Day16 extends App {
     if (counter == input.size) output
     else {
       val sum = input
-        .zip(generatePattern(counter + 1, input.size))
+        .zip { patternMap(counter + 1) }
         .map { x => x._1 * x._2 }
         .sum
         .abs
 
-      runPhase(input, counter + 1, output :+ sum % 10)
+      runPhase(input, patternMap, counter + 1, output :+ sum % 10)
     }
   }
 
   @tailrec
-  def runNumberOfPhases(input: List[Int], num: Int): List[Int] = {
+  def runNumberOfPhases(input: List[Int], num: Int, patternMap: Map[Int, List[Int]]): List[Int] = {
     if (num == 0) input
     else {
-      val newImput = runPhase(input, 0, List())
-      println(s"Phase ${num} ${newImput.take(8)}")
-      runNumberOfPhases(newImput, num - 1)
+      val newInput = runPhase(input, patternMap, 0, List())
+      runNumberOfPhases(newInput, num - 1, patternMap)
+    }
+  }
+
+  val input: List[Int] = getInput("inputs/day16.txt")
+  val patternMap: Map[Int, List[Int]] = (1 to input.size).toList.map { x => (x, generatePattern(x, input.size).toList) }.toMap
+
+  println(
+     s"\nDay 16 part 1 ${runNumberOfPhases(input, 100, patternMap).take(8).mkString}"
+   )
+
+  val offset = input.take(7).mkString.toInt
+  val phaseSize = input.size * 10000 - offset
+
+  @tailrec
+  def runPhasePart2(
+      phaseSize: Int,
+      input: Vector[Int],
+      counter: Int,
+      output: List[Int],
+      sum: Int
+  ): List[Int] = {
+    if (counter == phaseSize) output
+    else {
+      val newSum = sum + input(input.size - (counter % input.size) - 1)
+      runPhasePart2(
+        phaseSize,
+        input,
+        counter + 1,
+        (newSum % 10) +: output,
+        newSum
+      )
+    }
+  }
+
+  @tailrec
+  def runNumberOfPhasesPart2(
+      input: List[Int],
+      num: Int,
+      phaseSize: Int
+  ): List[Int] = {
+    if (num == 0) input
+    else {
+      val newInput = runPhasePart2(phaseSize, input.toVector, 0, List(), 0)
+      runNumberOfPhasesPart2(newInput, num - 1, phaseSize)
     }
   }
 
   println(
-    s"Day 16 part 1 ${runNumberOfPhases(getInput("inputs/day16.txt"), 100).take(8)}"
+    s"Day 16 part 2 ${runNumberOfPhasesPart2(input, 100, phaseSize).take(8).mkString}"
   )
+
 }
