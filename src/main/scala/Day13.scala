@@ -26,7 +26,7 @@ object Day13 extends App {
       output: Seq[Int]
   ): Seq[Int] = {
     intProg(stack, Seq(), index, relativeBaseOffset) match {
-      case State(output1, stack1, index1, relativeBaseOffset1) => {
+      case State(output1, stack1, index1, relativeBaseOffset1, _) => {
         if (index1 == -1) output
         else
           runProgram(
@@ -74,7 +74,7 @@ object Day13 extends App {
       score: BigInt
   ): BigInt = {
     intProg(stack, input, index, relativeBaseOffset) match {
-      case State(output1, stack1, index1, relativeBaseOffset1) => {
+      case State(output1, stack1, index1, relativeBaseOffset1, _) => {
         if (index1 == -1) score
         else {
           val newOutput =

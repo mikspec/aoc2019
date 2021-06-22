@@ -203,7 +203,7 @@ object Day15 extends App {
       Option.empty,
       Position(0, 0),
       Map(Position(0, 0) -> Right(0)),
-      State(0, progCode, 0, 0)
+      State(0, progCode, 0, 0, Seq())
     ),
     DIRS
   )

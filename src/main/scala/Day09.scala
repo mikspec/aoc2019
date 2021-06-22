@@ -32,7 +32,8 @@ object Day09 extends App {
       output: BigInt,
       stack: Map[BigInt, BigInt],
       index: BigInt,
-      relativeBaseOffset: BigInt
+      relativeBaseOffset: BigInt,
+      input: Seq[BigInt]
   )
 
   def intProg(
@@ -68,7 +69,7 @@ object Day09 extends App {
         relativeBaseOffset: BigInt
     ): State = {
       (reg.getOrElse(index, BigInt(0)) % 100).toInt match {
-        case 99 => State(-1, reg, -1, -1)
+        case 99 => State(-1, reg, -1, -1, Seq())
         case 1 =>
           step(
             regUpdate(
@@ -121,7 +122,8 @@ object Day09 extends App {
             ),
             reg,
             index + 2,
-            relativeBaseOffset
+            relativeBaseOffset,
+            input
           )
         case 5 =>
           step(
@@ -221,7 +223,7 @@ object Day09 extends App {
       output: Seq[BigInt],
       relativeBaseOffset: BigInt
   ): Seq[BigInt] = intProg(reg, conf, index, relativeBaseOffset) match {
-    case State(newOut, newProg, newIndex, newRelativeBaseOffset) => {
+    case State(newOut, newProg, newIndex, newRelativeBaseOffset, _) => {
       if (newIndex == -1) output
       else
         executeProg(

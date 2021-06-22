@@ -78,13 +78,13 @@ object Day11 extends App {
     val color = robot.camera(surface)
     val conf = Seq(if (color == Color.WHITE) BigInt(1) else BigInt(0))
     intProg(stack, conf, index, relativeBaseOffset) match {
-      case State(output1, stack1, index1, relativeBaseOffset1) => {
+      case State(output1, stack1, index1, relativeBaseOffset1, _) => {
         if (index1 == -1) surface
         else {
           val paintColor = if (output1 == 1) Color.WHITE else Color.BLACK
           val newSurface = robot.paint(paintColor, surface)
           intProg(stack1, Seq(), index1, relativeBaseOffset1) match {
-            case State(output2, stack2, index2, relativeBaseOffset2) => {
+            case State(output2, stack2, index2, relativeBaseOffset2, _) => {
               if (index2 == -1) newSurface
               else {
                 val newRobot = robot.step(output2.toInt)
